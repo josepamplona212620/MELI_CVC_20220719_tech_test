@@ -1,10 +1,13 @@
 {
+  "seed": 1,
   "exp": {
     "name": "Meli_moda"
   },  
   "data_loader": {
     "name": "meli_data_loader.MeliDataLoader",
-    "csv_file": "training_data.csv"
+    "csv_file": "training_data.csv",
+    "splits": 3,
+    "image_shape": 256
   },
   "model":{
     "learning_rate": 0.001,
