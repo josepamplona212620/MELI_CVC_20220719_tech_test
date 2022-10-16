@@ -1,6 +1,6 @@
 from data_loader.meli_data_loader import MeliDataLoader, Meli_moda_data_set
-# from models.simple_mnist_model import SimpleMnistModel
-# from trainers.simple_mnist_trainer import SimpleMnistModelTrainer
+from models.conv_meli_fashion_model import ConvMeliModaModel
+from trainers.conv_trainer import ConvModelTrainer
 from utils.config import process_config
 from utils.dirs import create_dirs
 from utils.utils import get_args
@@ -26,21 +26,19 @@ def main():
 
     #  Create de data loader
     data_loader = MeliDataLoader(config)
-    image_train_dataset, image_test_dataset = data_loader.get_train_test_data()
 
-    # print some examples of processed dataset
-    # for image, label in image_test_dataset.shuffle(10).take(1):
-    #     print(label.numpy(), label.numpy().shape, image.numpy().shape)
-    #     plt.imshow(image.numpy())
-    #     plt.show()
+    print('Create the model.')
+    model = ConvMeliModaModel(config).model
+    # model.model.summary()
 
+    print('Create the trainer')
+    trainer = ConvModelTrainer(model, data_loader.get_train_test_data(), config)
 
-    # print('Create the model.')
-    # model = SimpleMnistModel(config)
-    #
-    # print('Create the trainer')
-    # trainer = SimpleMnistModelTrainer(model.model, data_loader.get_train_data(), config)
-    #
+    for image, label in trainer.train_data.batch(2).take(1):
+        print(label.numpy(), label.numpy().shape, image.numpy().shape)
+        test_im = image.numpy()
+
+    print(model.predict(test_im))
     # print('Start training the model.')
     # trainer.train()
 
