@@ -1,4 +1,4 @@
-from data_loader.meli_data_loader import MeliDataLoader, Meli_moda_data_set
+from data_loader.meli_data_loader import MeliDataLoader, Meli_fashion_data_set
 from models.conv_meli_fashion_model import ConvMeliModaModel
 from trainers.conv_trainer import ConvModelTrainer
 from utils.config import process_config
@@ -20,7 +20,7 @@ def main():
     create_dirs([config.callbacks.tensorboard_log_dir, config.callbacks.checkpoint_dir])
 
     # Exploring the dataset
-    # meli_data_set = Meli_moda_data_set(config)
+    # meli_data_set = Meli_fashion_data_set(config)
     # meli_data_set.explore_dataset()
     # meli_data_set.print_data_categories()
 
