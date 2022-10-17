@@ -37,19 +37,26 @@ class MeliDataLoader(BaseDataLoader):
 
 
 class Meli_fashion_data_set():
-    def __init__(self, config):
-        self.pandas_dataset = pd.read_csv(config.data_loader.csv_file)
-        self.x, self.y = self.get_urls_and_labels()
-        self.size = len(self.pandas_dataset.index)
+    def __init__(self, csv_file):
+        self.pandas_dataset = pd.read_csv(csv_file)
+        self.corrected_dataframe = []
+        self.x = []
+        self.y = []
+        self.get_urls_and_labels()
+        self.size = len(self.corrected_dataframe.index)
 
     def get_urls_and_labels(self, include_third_class=False):
-        corrected_dataframe = self.pandas_dataset[self.pandas_dataset['picture_id'] != '699445-MLA50554255969_072022']
+        self.corrected_dataframe = self.pandas_dataset[
+            self.pandas_dataset['picture_id'] != '699445-MLA50554255969_072022'].reset_index()
         if not include_third_class:
-            corrected_dataframe = corrected_dataframe[corrected_dataframe['correct_background?'] != '?']
-        x = corrected_dataframe['picture_id'].apply(
+            self.corrected_dataframe = self.corrected_dataframe[
+                self.corrected_dataframe['correct_background?'] != '?'].reset_index()
+            self.y = self.corrected_dataframe.astype({'correct_background?': 'int'})['correct_background?']
+        else:
+            self.y = self.corrected_dataframe['correct_background?']
+        self.x = self.corrected_dataframe['picture_id'].apply(
             lambda l: 'https://http2.mlstatic.com/D_{}-F.jpg'.format(l))
-        y = corrected_dataframe.astype({'correct_background?': 'int'})['correct_background?']
-        return x, y
+        # return x, y
 
     def print_data_categories(self):
         copyed_modit_dataset = self.pandas_dataset.copy()
@@ -78,16 +85,18 @@ class Meli_fashion_data_set():
             axes[index, col].set_title(record.domain_id + ', bkgrd: ' + record['correct_background?'])
             axes[index, col].imshow(rgb_image)
         # return titles, images
-    
-    def explore_dataset(self):
-        non_labeled_bagrounds = self.pandas_dataset[self.pandas_dataset['correct_background?'] == '?']
-        labeled_bagrounds_0 = self.pandas_dataset[self.pandas_dataset['correct_background?'] == '0']
-        labeled_bagrounds_1 = self.pandas_dataset[self.pandas_dataset['correct_background?'] == '1']
 
-        dataset_samples_n = non_labeled_bagrounds.sample(n=3).reset_index()
-        dataset_samples_0 = labeled_bagrounds_0.sample(n=3).reset_index()
-        dataset_samples_1 = labeled_bagrounds_1.sample(n=3).reset_index()
-        
+    def explore_dataset(self, seed=None):
+        self.get_urls_and_labels(include_third_class=True)
+        self.corrected_dataframe['picture_url'] = self.x
+        non_labeled_bagrounds = self.corrected_dataframe[self.corrected_dataframe['correct_background?'] == '?']
+        labeled_bagrounds_0 = self.corrected_dataframe[self.corrected_dataframe['correct_background?'] == '0']
+        labeled_bagrounds_1 = self.corrected_dataframe[self.corrected_dataframe['correct_background?'] == '1']
+
+        dataset_samples_n = non_labeled_bagrounds.sample(n=3, random_state=seed).reset_index()
+        dataset_samples_0 = labeled_bagrounds_0.sample(n=3, random_state=seed).reset_index()
+        dataset_samples_1 = labeled_bagrounds_1.sample(n=3, random_state=seed).reset_index()
+
         figure, axes = plt.subplots(3, 3, figsize=(15, 15), sharey=True, sharex=True)
         self.explore_images_labels(dataset_samples_1, axes, 0)
         self.explore_images_labels(dataset_samples_n, axes, 1)

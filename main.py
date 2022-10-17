@@ -20,7 +20,7 @@ def main():
     create_dirs([config.callbacks.tensorboard_log_dir, config.callbacks.checkpoint_dir])
 
     # Exploring the dataset
-    # meli_data_set = Meli_fashion_data_set(config)
+    # meli_data_set = Meli_fashion_data_set("training_data.csv")
     # meli_data_set.explore_dataset()
     # meli_data_set.print_data_categories()
 
