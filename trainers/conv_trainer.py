@@ -33,20 +33,12 @@ class ConvModelTrainer(BaseTrain):
             )
         )
 
-        # if hasattr(self.config, "comet_api_key"):
-        #     from comet_ml import Experiment
-        #     experiment = Experiment(api_key=self.config.comet_api_key, project_name=self.config.exp_name)
-        #     experiment.disable_mp()
-        #     experiment.log_multiple_params(self.config)
-        #     self.callbacks.append(experiment.get_keras_callback())
-
     def train(self):
         history = self.model.fit(
-            self.train_data,
+            self.train_data.batch(self.config.trainer.batch_size),
             epochs=self.config.trainer.num_epochs,
             verbose=self.config.trainer.verbose_training,
-            batch_size=self.config.trainer.batch_size,
-            validation_data=self.test_data,
+            validation_data=self.test_data.batch(self.config.trainer.batch_size).take(2),
             callbacks=self.callbacks,
         )
         self.loss.extend(history.history['loss'])

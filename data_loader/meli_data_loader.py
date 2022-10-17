@@ -11,7 +11,7 @@ from data_loader import img_procesing as proc
 class MeliDataLoader(BaseDataLoader):
     def __init__(self, config):
         super(MeliDataLoader, self).__init__(config)
-        (self.x), (self.y) = Meli_fashion_data_set(config).load_data()
+        (self.x), (self.y) = Meli_fashion_data_set(config.data_loader.csv_file).get_urls_and_labels()
         self.splitter_iterator = self.get_stratified_split()
 
     def get_stratified_split(self):
@@ -56,7 +56,7 @@ class Meli_fashion_data_set():
             self.y = self.corrected_dataframe['correct_background?']
         self.x = self.corrected_dataframe['picture_id'].apply(
             lambda l: 'https://http2.mlstatic.com/D_{}-F.jpg'.format(l))
-        # return x, y
+        return self.x, self.y
 
     def print_data_categories(self):
         copyed_modit_dataset = self.pandas_dataset.copy()

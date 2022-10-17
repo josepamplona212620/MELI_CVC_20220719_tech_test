@@ -1,5 +1,5 @@
 from data_loader.meli_data_loader import MeliDataLoader, Meli_fashion_data_set
-from models.conv_meli_fashion_model import ConvMeliModaModel
+from models.conv_meli_fashion_model import ConvMeliFashionModel
 from trainers.conv_trainer import ConvModelTrainer
 from utils.config import process_config
 from utils.dirs import create_dirs
@@ -28,8 +28,8 @@ def main():
     data_loader = MeliDataLoader(config)
 
     print('Create the model.')
-    model = ConvMeliModaModel(config).model
-    # model.model.summary()
+    model = ConvMeliFashionModel(config).model
+    model.summary()
 
     print('Create the trainer')
     trainer = ConvModelTrainer(model, data_loader.get_train_test_data(), config)
@@ -39,8 +39,8 @@ def main():
         test_im = image.numpy()
 
     print(model.predict(test_im))
-    # print('Start training the model.')
-    # trainer.train()
+    print('Start training the model.')
+    trainer.train()
 
 
 if __name__ == '__main__':

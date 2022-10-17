@@ -2,9 +2,9 @@ from base.base_model import BaseModel
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Input, Dense, Conv2D, MaxPooling2D, Dropout, Flatten
 
-class ConvMeliModaModel(BaseModel):
+class ConvMeliFashionModel(BaseModel):
     def __init__(self, config):
-        super(ConvMeliModaModel, self).__init__(config)
+        super(ConvMeliFashionModel, self).__init__(config)
         self.in_shape = config.data_loader.image_shape
         self.build_model()
 
