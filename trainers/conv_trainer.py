@@ -8,10 +8,7 @@ class ConvModelTrainer(BaseTrain):
     def __init__(self, model, data, config):
         super(ConvModelTrainer, self).__init__(model, data, config)
         self.callbacks = []
-        self.loss = []
-        self.acc = []
-        self.val_loss = []
-        self.val_acc = []
+        self.history = {}
         self.init_callbacks()
 
     def init_callbacks(self):
@@ -35,33 +32,30 @@ class ConvModelTrainer(BaseTrain):
         )
 
     def train(self):
-        history = self.model.fit(
+        self.history = self.model.fit(
             self.train_data.batch(self.config.trainer.batch_size),
             epochs=self.config.trainer.num_epochs,
             verbose=self.config.trainer.verbose_training,
             validation_data=self.test_data.batch(self.config.trainer.batch_size).take(2),
             callbacks=self.callbacks,
         )
-        self.loss.extend(history.history['loss'])
-        self.acc.extend(history.history['acc'])
-        self.val_loss.extend(history.history['val_loss'])
-        self.val_acc.extend(history.history['val_acc'])
 
     def show_train_history(self):
+        keys_list = list(self.history.keys())
+        hist = [self.history[key] for key in keys_list]
         # summarize history for accuracy
-        plt.plot(self.acc)
-        plt.plot(self.val_acc)
+        plt.plot(hist[0])
+        plt.plot(hist[1])
         plt.title('model accuracy')
         plt.ylabel('accuracy')
         plt.xlabel('epoch')
         plt.legend(['train', 'test'], loc='upper left')
         plt.show()
         # summarize history for loss
-        plt.plot(self.loss)
-        plt.plot(self.val_loss)
+        plt.plot(hist[2])
+        plt.plot(hist[3])
         plt.title('model loss')
         plt.ylabel('loss')
         plt.xlabel('epoch')
         plt.legend(['train', 'test'], loc='upper left')
         plt.show()
-        
