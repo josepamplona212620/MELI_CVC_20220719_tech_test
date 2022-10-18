@@ -1,6 +1,7 @@
-from base.base_trainer import BaseTrain
-import os
 from tensorflow.keras.callbacks import ModelCheckpoint, TensorBoard
+from base.base_trainer import BaseTrain
+import matplotlib.pyplot as plt
+import os
 
 
 class ConvModelTrainer(BaseTrain):
@@ -45,3 +46,22 @@ class ConvModelTrainer(BaseTrain):
         self.acc.extend(history.history['acc'])
         self.val_loss.extend(history.history['val_loss'])
         self.val_acc.extend(history.history['val_acc'])
+
+    def show_train_history(self):
+        # summarize history for accuracy
+        plt.plot(self.acc)
+        plt.plot(self.val_acc)
+        plt.title('model accuracy')
+        plt.ylabel('accuracy')
+        plt.xlabel('epoch')
+        plt.legend(['train', 'test'], loc='upper left')
+        plt.show()
+        # summarize history for loss
+        plt.plot(self.loss)
+        plt.plot(self.val_loss)
+        plt.title('model loss')
+        plt.ylabel('loss')
+        plt.xlabel('epoch')
+        plt.legend(['train', 'test'], loc='upper left')
+        plt.show()
+        
