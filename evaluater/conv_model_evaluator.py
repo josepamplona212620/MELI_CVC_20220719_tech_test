@@ -1,4 +1,4 @@
-from data_loader.img_procesing import get_url_image, get_resized_image
+from data_loader.img_procesing import get_url_image, resize_image
 from base.base_evaluator import BaseEvaluator
 from sklearn.metrics import confusion_matrix
 import matplotlib as plt
@@ -27,15 +27,15 @@ class ConvModelEvaluator(BaseEvaluator):
         false_positives = self.results[self.results['tp_fp_tf_tn'] == -1.0].reset_index()
         false_negatives = self.results[self.results['tp_fp_tf_tn'] == 1.0].reset_index()
 
-        fig = plt.figure()
-        for i in range(1, 2*(num_examples + 1), 2):
-            img = get_resized_image(get_url_image(false_positives[i]['urls'].to_string()))
+        fig = plt.figure(figsize=(8, 4*num_examples))
+        for i in range(1, 2* num_examples + 1, 2):
+            img = resize_image(get_url_image(false_positives.iloc[i]['urls']))
             fig.add_subplot(num_examples, 2, i)
             plt.imshow(img)
-            img = get_resized_image(get_url_image(false_negatives[i]['urls'].to_string()))
+            img = resize_image(get_url_image(false_negatives.iloc[i]['urls']))
             fig.add_subplot(num_examples, 2, i+1)
             plt.imshow(img)
-        fig.axes[0].set_ylabel('Falsos Positivos')
-        fig.axes[1].set_ylabel('Falsos Negativos')
+        fig.axes[-2].set_xlabel('Falsos Positivos')
+        fig.axes[-1].set_xlabel('Falsos Negativos')
         plt.show()
 
