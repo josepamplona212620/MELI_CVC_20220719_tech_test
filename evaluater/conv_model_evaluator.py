@@ -17,12 +17,33 @@ class ConvModelEvaluator(BaseEvaluator):
         self.get_metrics()
 
     def get_conf_mat_metrics(self):
+        """
+        Get the confusion matrix and 5 metrics derived from it
+        The function get the predictions using the model and dataset from the instance
+        and compare them with the labels.
+
+        Returns
+        -------
+        None
+        """
         self.predictions = self.model.predict(self.x.batch(self.batch))[:, 1]
         self.conf_mat = confusion_matrix(self.y, np.rint(self.predictions))
         sns.heatmap(self.conf_mat, annot=True)
         self.get_metrics()
 
     def get_bad_results_with_image(self, num_examples):
+        """
+        Plot num_example image pairs of bad classified examples (false positives, false negatives)
+
+        Parameters
+        ----------
+        num_examples: int
+            number of pairs to plot
+
+        Returns
+        -------
+        None
+        """
         self.results['urls'] = self.image_urls
         false_positives = self.results[self.results['tp_fp_tf_tn'] == -1.0].reset_index()
         false_negatives = self.results[self.results['tp_fp_tf_tn'] == 1.0].reset_index()

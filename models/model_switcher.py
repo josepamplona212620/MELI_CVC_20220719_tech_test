@@ -1,12 +1,12 @@
 from sklearn.base import BaseEstimator
 from sklearn.tree import DecisionTreeClassifier
 
-class ModelSwitcher(BaseEstimator):
 
+class ModelSwitcher(BaseEstimator):
     def __init__(self, estimator=DecisionTreeClassifier()):
         """
         A Custom BaseEstimator that can switch between classifiers.
-        :param estimator: sklearn object - The classifier
+        param estimator: sklearn object - The classifier
         """
         self.estimator = estimator
 

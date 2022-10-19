@@ -12,6 +12,14 @@ class ConvModelTrainer(BaseTrain):
         self.init_callbacks()
 
     def init_callbacks(self):
+        """
+        instance callbacks for save and log model and training based on
+        the configuration in the config.json file
+
+        Returns
+        -------
+        None
+        """
         self.callbacks.append(
             ModelCheckpoint(
                 filepath=os.path.join(self.config.callbacks.checkpoint_dir,
@@ -32,6 +40,13 @@ class ConvModelTrainer(BaseTrain):
         )
 
     def train(self):
+        """
+        train the instance model based on the configuration in the config.json file
+
+        Returns
+        -------
+        None
+        """
         self.history = self.model.fit(
             self.train_data.batch(self.config.trainer.batch_size),
             epochs=self.config.trainer.num_epochs,
@@ -41,12 +56,19 @@ class ConvModelTrainer(BaseTrain):
         )
 
     def show_train_history(self):
+        """
+        Plot the data stored during training
+
+        Returns
+        -------
+        None
+        """
         keys_list = list(self.history.keys())
         hist = [self.history[key] for key in keys_list]
         # summarize history for accuracy
         plt.plot(hist[0])
         plt.plot(hist[1])
-        plt.title('model accuracy')
+        plt.title(keys_list[0]+' vs '+keys_list[1])
         plt.ylabel('accuracy')
         plt.xlabel('epoch')
         plt.legend(['train', 'test'], loc='upper left')
@@ -54,7 +76,7 @@ class ConvModelTrainer(BaseTrain):
         # summarize history for loss
         plt.plot(hist[2])
         plt.plot(hist[3])
-        plt.title('model loss')
+        plt.title(keys_list[2]+' vs '+keys_list[3])
         plt.ylabel('loss')
         plt.xlabel('epoch')
         plt.legend(['train', 'test'], loc='upper left')

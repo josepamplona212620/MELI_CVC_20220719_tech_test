@@ -15,8 +15,8 @@ def segment_with_threshold(picture, thresh):
 
     Returns
     -------
-    RGB segmented image
-    Gray scale segmented image
+    RGB segmented image ( np.ndarray)
+    Gray scale segmented image ( np.ndarray)
     """
     one_chanel_image = cv2.cvtColor(picture, cv2.COLOR_RGB2GRAY)
     _, image_threshold = cv2.threshold(one_chanel_image, thresh, 255, cv2.THRESH_BINARY)
@@ -34,13 +34,13 @@ def get_image_sides(gray_picture):
 
     Returns
     -------
-    top_side: uint8
+    top_side:  numpy.ndarray
         image from the middle to the top of the input image
-    bottom_side: uint8
+    bottom_side:  numpy.ndarray
         image from the middle to the bottom of the input image
-    left_side: uint8
+    left_side:  numpy.ndarray
         image from the middle to the left of the input image
-    right_side: uint8
+    right_side:  numpy.ndarray
         image from the middle to the right of the input image
     """
     pic_h, pic_w = gray_picture.shape
@@ -57,7 +57,7 @@ def get_moments_features(gray_picture):
     Parameters
     ----------
     picture : uint8
-        gray scale image to segment
+        gray scale image to apply segmentation
 
     Returns
     -------
@@ -81,6 +81,20 @@ def get_moments_features(gray_picture):
         return [relative_aera, x_centroid/pic_w, y_centroid/pic_h]
 
 def get_color_features(rgb_image):
+    """
+    Converts image into HSV color space and calculates 27 color features
+    Get 15 values from the HUE histogram and 12 from the Value (intensity) histogram
+
+    Parameters
+    ----------
+    picture : uint8
+        RGB image
+
+    Returns
+    -------
+    list of 12 values from HUE histogram
+    list of 15 values from Value (intensity) histogram
+    """
     pic_h, pic_w, _ = rgb_image.shape
     hsv_image = cv2.cvtColor(rgb_image, cv2.COLOR_RGB2HSV)
     hist_color, _ = np.histogram(hsv_image[:, :, 0], bins=16, range=(0, 180), density=True)
@@ -88,12 +102,42 @@ def get_color_features(rgb_image):
     return list(hist_color[1:])+list(hist_value[20:])
 
 def get_texture_features(gray_picture):
+    """
+    Uses mahotas library to calculate 13 out of the 14 Haralick features from the image texture
+    It is processed in 4 different position getting 52 features
+
+    Parameters
+    ----------
+    picture : uint8
+        Gray scale image
+
+    Returns
+    -------
+    list of 52 Haralick features
+    """
     labeled, n = mh.label(gray_picture)
     h_feature = mh.features.haralick(labeled)
     # lbp_feature = mh.features.lbp(labeled, 3, 8)
     return list(h_feature.flatten())  # +list(lbp_feature)
 
 def get_features_record(image, threshold):
+    """
+    Segment clear image backgrounds and calculates color, morphological and texture features
+    Return 91 image numeric features
+        - 27 color features
+        - 12 morphological features
+        - 52 texture features
+
+    Parameters
+    ----------
+    picture : uint8
+        RGB image
+
+    Returns
+    -------
+    features: list
+    91 numerica features from the input image
+    """
     h, w, ch = image.shape
     if sum(image.shape) > 1500:
         image = cv2.resize(image, (int(w/2), int(h/2)))
@@ -106,6 +150,14 @@ def get_features_record(image, threshold):
     return features
 
 def get_features_names():
+    """
+    Defines the feature names for 91 image numeric features
+
+    Returns
+    -------
+    col_names: list
+        names of features columns for a pandas dataset
+    """
     col_names_color = ['color' + str(i) for i in range(15)]
     col_names_intensity = ['value' + str(i) for i in range(12)]
     col_names_texture = ['texture' + str(i) for i in range(52)]

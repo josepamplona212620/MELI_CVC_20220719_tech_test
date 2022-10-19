@@ -9,6 +9,7 @@ threshold = 200
 save_batches = 53  # For saving in intervals
 file_name = "features_validation_dataset.csv"
 
+# Validate that we are not overwriting the data
 if Path(file_name).is_file():
     print('This dataset exist: The feature records will be appended to it')
 else:

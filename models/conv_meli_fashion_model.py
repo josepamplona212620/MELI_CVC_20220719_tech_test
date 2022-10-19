@@ -9,6 +9,13 @@ class ConvMeliFashionModel(BaseModel):
         self.build_model()
 
     def build_model(self):
+        """
+        Builds a tf.keras Sequential model based on the configurations in the config.json file
+
+        Returns
+        -------
+        None
+        """
         self.model = Sequential()
         self.model.add(Conv2D(self.config.model.conv[0], kernel_size=(3, 3), padding='same',
                               activation='relu', input_shape=(self.in_shape, self.in_shape, 3)))
