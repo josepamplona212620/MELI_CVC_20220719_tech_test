@@ -28,7 +28,7 @@ class ClassicModelEvaluator(BaseEvaluator):
         false_negatives = self.results[self.results['tp_fp_tf_tn'] == 1.0].reset_index()
 
         fig = plt.figure(figsize=(8, 4*num_examples))
-        for i in range(1, 2* num_examples + 1, 2):
+        for i in range(1, 2 * num_examples + 1, 2):
             img = resize_image(get_url_image(false_positives.iloc[i]['urls']))
             fig.add_subplot(num_examples, 2, i)
             plt.imshow(img)
