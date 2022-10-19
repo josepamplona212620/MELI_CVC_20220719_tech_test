@@ -1,7 +1,7 @@
 {
   "seed": 1,
   "exp": {
-    "name": "Meli_moda"
+    "name": "Conv_background_classifier"
   },  
   "data_loader": {
     "name": "meli_data_loader.MeliDataLoader",
@@ -19,8 +19,8 @@
     "drop": 0.3
   },
   "trainer":{
-    "num_epochs": 3,
-    "batch_size": 8,
+    "num_epochs": 20,
+    "batch_size": 256,
     "verbose_training": true
   },
   "callbacks":{

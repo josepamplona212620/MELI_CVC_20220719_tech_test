@@ -1,4 +1,6 @@
 from base.base_model import BaseModel
+import tensorflow as tf
+import numpy as np
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Conv2D, MaxPooling2D, Dropout, Flatten
 
@@ -16,6 +18,7 @@ class ConvMeliFashionModel(BaseModel):
         -------
         None
         """
+        self.reset_seed()
         self.model = Sequential()
         self.model.add(Conv2D(self.config.model.conv[0], kernel_size=(3, 3), padding='same',
                               activation='relu', input_shape=(self.in_shape, self.in_shape, 3)))
@@ -36,3 +39,7 @@ class ConvMeliFashionModel(BaseModel):
               loss='binary_crossentropy',
               optimizer=self.config.model.optimizer,
               metrics=['accuracy'])
+
+    def reset_seed(self):
+        np.random.RandomState(self.config.seed)
+        tf.keras.utils.set_random_seed(self.config.seed)

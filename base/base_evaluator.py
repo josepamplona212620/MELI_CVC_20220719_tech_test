@@ -38,7 +38,7 @@ class BaseEvaluator(object):
         self.accuracy = (tp + tn) / (tp + tn + fp + fn)
         self.sensitivity = tp / (tp + fn)
         self.specificity = tn / (tn + fp)
-        self.precision = tp / (tp + fn)
+        self.precision = tp / (tp + fp)
         self.f1 = 2 * self.sensitivity * self.specificity / (self.sensitivity + self.specificity)
         self.get_results_dataset()
 

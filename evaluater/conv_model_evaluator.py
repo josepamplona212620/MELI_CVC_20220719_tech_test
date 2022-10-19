@@ -1,7 +1,7 @@
 from data_loader.img_procesing import get_url_image, resize_image
 from base.base_evaluator import BaseEvaluator
 from sklearn.metrics import confusion_matrix
-import matplotlib as plt
+import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
 
@@ -14,7 +14,7 @@ class ConvModelEvaluator(BaseEvaluator):
         self.y = data[1]
         self.image_urls = urls
         self.batch = batch
-        self.get_metrics()
+        self.get_conf_mat_metrics()
 
     def get_conf_mat_metrics(self):
         """

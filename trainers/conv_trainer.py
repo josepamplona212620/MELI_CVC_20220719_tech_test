@@ -1,6 +1,8 @@
 from tensorflow.keras.callbacks import ModelCheckpoint, TensorBoard
 from base.base_trainer import BaseTrain
 import matplotlib.pyplot as plt
+import tensorflow as tf
+import numpy as np
 import os
 
 
@@ -47,6 +49,7 @@ class ConvModelTrainer(BaseTrain):
         -------
         None
         """
+        self.reset_seed()
         self.history = self.model.fit(
             self.train_data.batch(self.config.trainer.batch_size),
             epochs=self.config.trainer.num_epochs,
@@ -63,21 +66,25 @@ class ConvModelTrainer(BaseTrain):
         -------
         None
         """
-        keys_list = list(self.history.keys())
-        hist = [self.history[key] for key in keys_list]
+        keys_list = list(self.history.history.keys())
+        hist = [self.history.history[key] for key in keys_list]
         # summarize history for accuracy
         plt.plot(hist[0])
-        plt.plot(hist[1])
-        plt.title(keys_list[0]+' vs '+keys_list[1])
+        plt.plot(hist[2])
+        plt.title(keys_list[0]+' vs '+keys_list[2])
         plt.ylabel('accuracy')
         plt.xlabel('epoch')
         plt.legend(['train', 'test'], loc='upper left')
         plt.show()
         # summarize history for loss
-        plt.plot(hist[2])
+        plt.plot(hist[1])
         plt.plot(hist[3])
-        plt.title(keys_list[2]+' vs '+keys_list[3])
+        plt.title(keys_list[1]+' vs '+keys_list[3])
         plt.ylabel('loss')
         plt.xlabel('epoch')
         plt.legend(['train', 'test'], loc='upper left')
         plt.show()
+
+    def reset_seed(self):
+        np.random.RandomState(self.config.seed)
+        tf.keras.utils.set_random_seed(self.config.seed)
