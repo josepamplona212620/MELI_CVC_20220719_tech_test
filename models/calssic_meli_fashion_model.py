@@ -1,10 +1,8 @@
 from base.base_model import BaseModel
 from models.model_switcher import ModelSwitcher
 from sklearn.preprocessing import StandardScaler
-from sklearn.model_selection import GridSearchCV, StratifiedKFold, cross_val_score
+from sklearn.model_selection import GridSearchCV
 from sklearn.pipeline import Pipeline
-from sklearn.svm import SVC
-from sklearn.metrics import classification_report
 
 steps = Pipeline([('scaler', StandardScaler()),
                   ('model', ModelSwitcher())])

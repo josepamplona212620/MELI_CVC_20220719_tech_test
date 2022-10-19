@@ -1,6 +1,6 @@
 from base.base_model import BaseModel
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Input, Dense, Conv2D, MaxPooling2D, Dropout, Flatten
+from tensorflow.keras.layers import Dense, Conv2D, MaxPooling2D, Dropout, Flatten
 
 class ConvMeliFashionModel(BaseModel):
     def __init__(self, config):
