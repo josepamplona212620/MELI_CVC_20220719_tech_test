@@ -1,24 +1,41 @@
+from data_loader.img_procesing import get_url_image, get_resized_image
 from base.base_evaluator import BaseEvaluator
 from sklearn.metrics import confusion_matrix
+import matplotlib as plt
 import seaborn as sns
 import numpy as np
 
 
 class ConvModelEvaluator(BaseEvaluator):
-    def __init__(self, model, data, checkpoint_path, batch, iterations=False):
+    def __init__(self, model, data, checkpoint_path, batch, urls):
         super(ConvModelEvaluator, self).__init__(model)
         self.model = model.load(checkpoint_path)
         self.x = data[0]
         self.y = data[1]
+        self.image_urls = urls
         self.batch = batch
-        self.num_iter = iterations
         self.get_metrics()
 
     def get_conf_mat_metrics(self):
-        if self.num_iter:
-            self.predictions = self.model.predict(self.x.batch(self.batch).take(self.num_iter))[:, 1]
-        else:
-            self.predictions = self.model.predict(self.x.batch(self.batch))[:, 1]
+        self.predictions = self.model.predict(self.x.batch(self.batch))[:, 1]
         self.conf_mat = confusion_matrix(self.y, np.rint(self.predictions))
         sns.heatmap(self.conf_mat, annot=True)
         self.get_metrics()
+
+    def get_bad_results_with_image(self, num_examples):
+        self.results['urls'] = self.image_urls
+        false_positives = self.results[self.results['tp_fp_tf_tn'] == -1.0].reset_index()
+        false_negatives = self.results[self.results['tp_fp_tf_tn'] == 1.0].reset_index()
+
+        fig = plt.figure()
+        for i in range(1, 2*(num_examples + 1), 2):
+            img = get_resized_image(get_url_image(false_positives[i]['urls'].to_string()))
+            fig.add_subplot(num_examples, 2, i)
+            plt.imshow(img)
+            img = get_resized_image(get_url_image(false_negatives[i]['urls'].to_string()))
+            fig.add_subplot(num_examples, 2, i+1)
+            plt.imshow(img)
+        fig.axes[0].set_ylabel('Falsos Positivos')
+        fig.axes[1].set_ylabel('Falsos Negativos')
+        plt.show()
+

@@ -1,4 +1,4 @@
-from data_loader.meli_data_loader import MeliDataLoader, Meli_fashion_data_set
+from data_loader.meli_data_loader import MeliDataLoader, MeliFashionDataSet
 from models.conv_meli_fashion_model import ConvMeliFashionModel
 from evaluater.conv_model_evaluator import ConvModelEvaluator
 from evaluater.classic_model_evaluator import C
@@ -22,7 +22,7 @@ def main():
     create_dirs([config.callbacks.tensorboard_log_dir, config.callbacks.checkpoint_dir])
 
     # Exploring the dataset
-    meli_data_set = Meli_fashion_data_set("training_data.csv")
+    meli_data_set = MeliFashionDataSet("training_data.csv")
     meli_data_set.explore_dataset()
     meli_data_set.print_data_categories()
 

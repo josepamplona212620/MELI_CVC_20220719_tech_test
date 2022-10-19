@@ -7,8 +7,8 @@ import numpy as np
 class BaseEvaluator(object):
     def __init__(self, model):
         self.model = model
-        self.x = []
-        self.y = []
+        self.x = np.empty([1], dtype=int)
+        self.y = np.empty([1], dtype=int)
         self.predictions = []
         self.conf_mat = np.empty([2, 2], dtype=int)
         self.accuracy = []
@@ -16,7 +16,14 @@ class BaseEvaluator(object):
         self.sensitivity = []
         self.specificity = []
         self.precision = []
-        self.comparations = []
+        self.results = pd.DataFrame()
+        self.result_dictionary = {
+            -1.0: 'Falsos Positivos',
+            0.0: 'Verdaderos Negativos',
+            1.0: 'Falsos Negativos',
+            2.0: 'Verdaderos Positivos'
+        }
+
 
     def get_metrics(self):
         tn, fp, fn, tp = self.conf_mat.ravel()
@@ -25,30 +32,9 @@ class BaseEvaluator(object):
         self.specificity = tn / (tn + fp)
         self.precision = tp / (tp + fn)
         self.f1 = 2 * self.sensitivity * self.specificity / (self.sensitivity + self.specificity)
+        self.get_results_dataset()
 
-    def get_precision_sensitivity_curves(self):
-        precision, recall, thresholds = precision_recall_curve(self.y, self.predictions)
-        fpr, tpr, _ = roc_curve(self.y, self.predictions)
-        print('AUC metric: ', auc(fpr, tpr) * 100, '%\n')
-        plt.plot(precision, recall)
-        plt.ylabel('recall')
-        plt.xlabel('Precision')
-        plt.title('Curva ROC')
-        plt.show()
-        print('\n\n\n')
-        fig, ax1 = plt.subplots()
-        ax1.set_title('Curvas de sensibilidad y precisión')
-        ax2 = ax1.twinx()
-        ax1.plot(thresholds, recall[:-1], 'g-')
-        ax2.plot(thresholds, precision[:-1], 'b-')
-        ax1.set_xlabel('threshold')
-        ax1.set_ylabel('Sensitivity')
-        ax2.set_ylabel('Precision')
-        ax1.yaxis.label.set_color('g')
-        ax2.yaxis.label.set_color('b')
-        plt.show()
-
-    def get_predict_distributions(self):
+    def get_results_dataset(self):
         self.results = pd.DataFrame(
             list(zip(self.y.astype(int), np.rint(self.predictions).astype(int), self.predictions)),
             columns=['label', 'prediction', 'proba'])
@@ -57,6 +43,34 @@ class BaseEvaluator(object):
         self.results['fp_tf'] = self.results.label - self.results.prediction
         self.results['tp_fp_tf_tn'] = self.results.apply(
             lambda x: x['tp_f_tn'] * x['fp_tf'] if x['fp_tf'] != 0 else x['tp_f_tn'], axis=1)
+
+    def get_ROC_curves(self):
+        fpr, tpr, _ = roc_curve(self.y, self.predictions)
+        print('AUC metric: ', auc(fpr, tpr) * 100, '%\n')
+
+        plt.plot(fpr, tpr)
+        plt.ylabel('recall')
+        plt.xlabel('Precision')
+        plt.title('Curva ROC')
+        plt.show()
+
+    def get_precision_sensitivity_curves(self):
+        precision, recall, thresholds = precision_recall_curve(self.y, self.predictions)
+
+        fig, ax1 = plt.subplots()
+        ax2 = ax1.twinx()
+        ax1.plot(thresholds, recall[:-1], 'g-')
+        ax2.plot(thresholds, precision[:-1], 'b-')
+
+        ax1.set_xlabel('threshold')
+        ax1.set_ylabel('Sensitivity')
+        ax2.set_ylabel('Precision')
+        ax1.set_title('Curvas de sensibilidad y precisión')
+        ax1.yaxis.label.set_color('g')
+        ax2.yaxis.label.set_color('b')
+        plt.show()
+
+    def get_predict_distributions(self):
         groups = self.results.groupby(['tp_fp_tf_tn'])['proba']
         fp, tn, fn, tp = [groups.get_group(x) for x in groups.groups]
 
@@ -81,20 +95,17 @@ class BaseEvaluator(object):
         plt.show()
 
     def get_moderation_thresh(self, thresh_l, thresh_h):
-        moderate_index = (self.results['proba'] > thresh_l) & (self.results['proba'] < thresh_h)
-
         moderate = self.results[(self.results['proba'] > thresh_l) & (self.results['proba'] < thresh_h)]
         trust = self.results[(self.results['proba'] <= thresh_l) | (self.results['proba'] >= thresh_h)]
 
-        trust = trust.value_counts(normalize=True)
-        thresh_acc = 100 * (trust[0] + trust[1]) / len(trust.index)
-        thresh_fn = 100 * trust[1] / len(trust.index)
-        thresh_fn2 = 100 * trust[1] / len(self.results.index)
+        trust_counts = trust['tp_fp_tf_tn'].value_counts(normalize=True).sort_index()
+        thresh_acc = 100*(trust_counts[0.0]+trust_counts[2.0])
+        thresh_fn = 100*trust_counts[1.0]
+        thresh_fn2 = 100*len(trust.index)*trust_counts[1.0]/len(self.results.index)
 
-        print("Tomando un intervalo para moderar: ", thresh_l, ' a ', thresh_h)
+        print("Tomando un intervalo para moderar: ", thresh_l,' a ', thresh_h)
         print("la proporcion de imágenes a moderar es del : ", end=' ')
-        print((len(trust.index) / len(self.results.index) * 100), '%', end='\n')
+        print((100*len(moderate.index)/len(self.results.index)),'%', end='\n')
         print('Y el accuracy del las demas predicciones sería de: ', thresh_acc)
         print('donde solo se presentan el ', thresh_fn, '% de falsos negativos')
-        print('y en comparación con el dataset de prueba un ', thresh_fn, '%')
-
+        print('y en comparación con el dataset de prueba un ', thresh_fn2, '%')

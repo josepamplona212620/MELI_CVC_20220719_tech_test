@@ -11,7 +11,7 @@ from data_loader import img_procesing as proc
 class MeliDataLoader(BaseDataLoader):
     def __init__(self, config):
         super(MeliDataLoader, self).__init__(config)
-        (self.x), (self.y) = Meli_fashion_data_set(config.data_loader.csv_file).get_urls_and_labels()
+        (self.x), (self.y) = MeliFashionDataSet(config.data_loader.csv_file).get_urls_and_labels()
         self.splitter_iterator = self.get_stratified_split()
 
     def get_stratified_split(self):
@@ -41,7 +41,7 @@ class MeliDataLoader(BaseDataLoader):
         return [image_valid_dataset, self.y]
 
 
-class Meli_fashion_data_set():
+class MeliFashionDataSet(object):
     def __init__(self, csv_file):
         self.pandas_dataset = pd.read_csv(csv_file)
         self.corrected_dataframe = []
@@ -52,7 +52,7 @@ class Meli_fashion_data_set():
 
     def get_urls_and_labels(self, include_third_class=False):
         self.corrected_dataframe = self.pandas_dataset[
-            self.pandas_dataset['picture_id'] != '699445-MLA50554255969_072022'].reset_index()
+            self.pandas_dataset['picture_id'] != '699445-MLA50554255969_072022'].reset_index()  # it's corrupted data
         if not include_third_class:
             self.corrected_dataframe = self.corrected_dataframe[
                 self.corrected_dataframe['correct_background?'] != '?'].reset_index()

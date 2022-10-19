@@ -1,10 +1,10 @@
 from data_loader.feature_extractors import get_features_record, get_features_names
-from data_loader.meli_data_loader import Meli_fashion_data_set
+from data_loader.meli_data_loader import MeliFashionDataSet
 from pathlib import Path
 import csv
 
 
-feat_dataset = Meli_fashion_data_set("productive_data.csv")
+feat_dataset = MeliFashionDataSet("productive_data.csv")
 threshold = 200
 save_batches = 53  # For saving in intervals
 file_name = "features_validation_dataset.csv"
