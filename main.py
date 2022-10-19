@@ -1,6 +1,7 @@
 from data_loader.meli_data_loader import MeliDataLoader, Meli_fashion_data_set
 from models.conv_meli_fashion_model import ConvMeliFashionModel
 from evaluater.conv_model_evaluator import ConvModelEvaluator
+from evaluater.classic_model_evaluator import C
 from trainers.conv_trainer import ConvModelTrainer
 from utils.config import process_config
 from utils.dirs import create_dirs
@@ -17,25 +18,25 @@ def main():
         print("missing or invalid arguments")
         exit(0)
 
-    # # create the experiments dirs
-    # create_dirs([config.callbacks.tensorboard_log_dir, config.callbacks.checkpoint_dir])
-    #
-    # # Exploring the dataset
-    # # meli_data_set = Meli_fashion_data_set("training_data.csv")
-    # # meli_data_set.explore_dataset()
-    # # meli_data_set.print_data_categories()
-    #
-    # #  Create de data loader
-    # data_loader = MeliDataLoader(config)
-    #
-    # # 'Create the model.'
-    # model = ConvMeliFashionModel(config).model
-    # # model.summary()
-    #
-    # # Create the trainer
-    # trainer = ConvModelTrainer(model, data_loader.get_train_test_data(), config)
-    # print('Start training the model.')
-    # trainer.train()
+    # create the experiments dirs
+    create_dirs([config.callbacks.tensorboard_log_dir, config.callbacks.checkpoint_dir])
+
+    # Exploring the dataset
+    meli_data_set = Meli_fashion_data_set("training_data.csv")
+    meli_data_set.explore_dataset()
+    meli_data_set.print_data_categories()
+
+    #  Create de data loader
+    data_loader = MeliDataLoader(config)
+
+    # 'Create the model.'
+    model = ConvMeliFashionModel(config).model
+    # model.summary()
+
+    # Create the trainer
+    trainer = ConvModelTrainer(model, data_loader.get_train_test_data(), config)
+    print('Start training the model.')
+    trainer.train()
 
 
     # Evaluation section

@@ -43,6 +43,9 @@ def get_texture_features(gray_picture):
     return list(h_feature.flatten())  # +list(lbp_feature)
 
 def get_features_record(image, threshold):
+    h, w, ch = image.shape
+    if sum(image.shape) > 1500:
+        image = cv2.resize(image, (int(w/2), int(h/2)))
     segmented_image, segmented_img_gray = segmentate_thresh_(image, threshold)
     features = []
     features = features+list(get_color_features(segmented_image))

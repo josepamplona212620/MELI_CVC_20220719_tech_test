@@ -20,6 +20,7 @@ class BaseModel(object):
         print("Loading model checkpoint {} ...\n".format(checkpoint_path))
         self.model.load_weights(checkpoint_path)
         print("Model loaded")
+        return self.model
 
     def build_model(self):
         raise NotImplementedError

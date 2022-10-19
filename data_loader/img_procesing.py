@@ -35,3 +35,6 @@ def tf_get_resized_image(picture_url, label):
 
 def tf_get_threshold_image(picture_url, label):
     return tf.py_function(get_threshold_image, [picture_url], tf.float32)/255, tf.one_hot(label, 2)
+
+def tf_get_thresh_valid_image(picture_url):
+    return tf.py_function(get_threshold_image, [picture_url], tf.float32)/255

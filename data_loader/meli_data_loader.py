@@ -36,12 +36,10 @@ class MeliDataLoader(BaseDataLoader):
         return image_train_dataset, image_test_dataset
 
     def get_validation_data(self):
-        url_valid_dataset = tf.data.Dataset.from_tensor_slices((
-                                                                self.x.values,
-                                                                self.y.values
-                                                               ))
-        image_train_dataset = url_valid_dataset.map(proc.tf_get_threshold_image).prefetch(tf.data.AUTOTUNE)
-        return image_train_dataset
+        url_valid_dataset = tf.data.Dataset.from_tensor_slices(self.x.values)
+        image_valid_dataset = url_valid_dataset.map(proc.tf_get_thresh_valid_image).prefetch(tf.data.AUTOTUNE)
+        return [image_valid_dataset, self.y]
+
 
 class Meli_fashion_data_set():
     def __init__(self, csv_file):
