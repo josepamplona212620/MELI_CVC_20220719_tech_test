@@ -26,6 +26,14 @@ class BaseEvaluator(object):
 
 
     def get_metrics(self):
+        """
+        Calculates the confusion matrix and 5 metrics from this one.
+        Also create a results Dataframe with all the results in the evaluation
+
+        Returns
+        -------
+        None
+        """
         tn, fp, fn, tp = self.conf_mat.ravel()
         self.accuracy = (tp + tn) / (tp + tn + fp + fn)
         self.sensitivity = tp / (tp + fn)
@@ -35,6 +43,14 @@ class BaseEvaluator(object):
         self.get_results_dataset()
 
     def get_results_dataset(self):
+        """
+        Create results Dataframe by zipping the labels, predictions and probability predictions and label them
+        with the result_dictionary of te class.
+
+        Returns
+        -------
+        None
+        """
         self.results = pd.DataFrame(
             list(zip(self.y.astype(int), np.rint(self.predictions).astype(int), self.predictions)),
             columns=['label', 'prediction', 'proba'])
@@ -45,6 +61,13 @@ class BaseEvaluator(object):
             lambda x: x['tp_f_tn'] * x['fp_tf'] if x['fp_tf'] != 0 else x['tp_f_tn'], axis=1)
 
     def get_ROC_curves(self):
+        """
+        Print the AUC metric and plot the ROC curve as a binary classification metric
+
+        Returns
+        -------
+        None
+        """
         fpr, tpr, _ = roc_curve(self.y, self.predictions)
         print('AUC metric: ', auc(fpr, tpr) * 100, '%\n')
 
@@ -55,6 +78,13 @@ class BaseEvaluator(object):
         plt.show()
 
     def get_precision_sensitivity_curves(self):
+        """
+        Plot the Sensitivity and precision curves with respect to the change in threshold election.
+
+        Returns
+        -------
+        None
+        """
         precision, recall, thresholds = precision_recall_curve(self.y, self.predictions)
 
         fig, ax1 = plt.subplots()
@@ -71,6 +101,14 @@ class BaseEvaluator(object):
         plt.show()
 
     def get_predict_distributions(self):
+        """
+        Plot a distribution of 'True Positives', 'True Negatives', 'False Positives' and 'False Negatives'
+        in order to identify which thresholds can segment them
+
+        Returns
+        -------
+        None
+        """
         groups = self.results.groupby(['tp_fp_tf_tn'])['proba']
         fp, tn, fn, tp = [groups.get_group(x) for x in groups.groups]
 
@@ -95,6 +133,13 @@ class BaseEvaluator(object):
         plt.show()
 
     def get_moderation_thresh(self, thresh_l, thresh_h):
+        """
+        Print the effects on excluding some results that can be analyzed later
+
+        Returns
+        -------
+        None
+        """
         moderate = self.results[(self.results['proba'] > thresh_l) & (self.results['proba'] < thresh_h)]
         trust = self.results[(self.results['proba'] <= thresh_l) | (self.results['proba'] >= thresh_h)]
 

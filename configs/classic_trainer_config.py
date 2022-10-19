@@ -3,6 +3,14 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.linear_model import SGDClassifier
 
 def get_grid_search_parámeters(seed):
+    """
+    It is used to store the configuration parameters of a multi-model grid search training
+
+    Returns
+    -------
+    parameters: list of dicts
+        parameters of a multi-model grid search
+    """
     parameters = [
         {
             'model__estimator': [SGDClassifier()],  # SVM if hinge loss, logreg if log
